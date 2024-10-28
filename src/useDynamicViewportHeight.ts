@@ -1,34 +1,43 @@
+// src/useDynamicViewportHeight.ts
 import { useEffect, useState } from "react";
 
 const useDynamicViewportHeight = () => {
-  // Track the initial height to compare when resizing
+  // Track initial and current viewport height
   const [initialHeight, setInitialHeight] = useState<number | null>(null);
 
   useEffect(() => {
-    // Function to set the viewport height as a CSS variable
+    // Set the viewport height CSS variable
     const setViewportHeight = () => {
       const vh = window.innerHeight * 0.01;
       document.documentElement.style.setProperty("--vh", `${vh}px`);
     };
 
-    // Set initial height and viewport height
+    // Detect initial height and set viewport
     setInitialHeight(window.innerHeight);
     setViewportHeight();
 
-    // Update viewport height on resize
+    // Resize handler to manage viewport adjustments
     const handleResize = () => {
       const currentHeight = window.innerHeight;
-
-      // Check if the height change is significant (e.g., keyboard opened/closed)
       if (initialHeight && Math.abs(initialHeight - currentHeight) > 100) {
         setViewportHeight();
       }
     };
 
-    window.addEventListener("resize", handleResize);
+    // Keyboard event handlers for additional adjustment
+    const handleKeyboardOpen = () => setViewportHeight();
+    const handleKeyboardClose = () => setViewportHeight();
 
+    // Add event listeners for resize and keyboard
+    window.addEventListener("resize", handleResize);
+    window.addEventListener("focusin", handleKeyboardOpen); // Focusin when keyboard opens
+    window.addEventListener("focusout", handleKeyboardClose); // Focusout when keyboard closes
+
+    // Cleanup event listeners
     return () => {
       window.removeEventListener("resize", handleResize);
+      window.removeEventListener("focusin", handleKeyboardOpen);
+      window.removeEventListener("focusout", handleKeyboardClose);
     };
   }, [initialHeight]);
 
