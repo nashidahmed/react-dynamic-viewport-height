@@ -3,3 +3,4 @@ export const placeholder = () => {
 };
 
 export { default as useDynamicViewportHeight } from "./useDynamicViewportHeight";
+export { default as ViewportHeightProvider } from "./ViewportHeightProvider";
