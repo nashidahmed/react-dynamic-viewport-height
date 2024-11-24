@@ -7,8 +7,10 @@ const useViewportHeightEffect = () => {
 
   useEffect(() => {
     // Detect initial height and set viewport
-    setInitialHeight(window.innerHeight);
-    setViewportHeight();
+    const handleInitialLoad = () => {
+      setInitialHeight(window.innerHeight);
+      setViewportHeight();
+    };
 
     // Resize handler to manage viewport adjustments
     const handleResize = () => {
@@ -22,6 +24,13 @@ const useViewportHeightEffect = () => {
     const handleKeyboardOpen = () => setViewportHeight();
     const handleKeyboardClose = () => setViewportHeight();
 
+    // Ensure the correct height is set during the initial load
+    if (document.readyState === "complete") {
+      handleInitialLoad();
+    } else {
+      window.addEventListener("load", handleInitialLoad);
+    }
+
     // Add event listeners for resize and keyboard
     window.addEventListener("resize", handleResize);
     window.addEventListener("focusin", handleKeyboardOpen); // Focusin when keyboard opens
@@ -29,6 +38,7 @@ const useViewportHeightEffect = () => {
 
     // Cleanup event listeners
     return () => {
+      window.removeEventListener("load", handleInitialLoad);
       window.removeEventListener("resize", handleResize);
       window.removeEventListener("focusin", handleKeyboardOpen);
       window.removeEventListener("focusout", handleKeyboardClose);
